@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f1f2f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b0d17" media="(prefers-color-scheme: dark)">
+  <title>Hindi Words</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234338ca'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='Noto Sans Devanagari, sans-serif'%3E%E0%A4%B9%E0%A4%BF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <span class="brand-mark" aria-hidden="true">हि</span>
+      <div class="app-titles">
+        <h1 class="app-title">हिन्दी शब्द</h1>
+        <p class="app-subtitle">Hindi Words</p>
+      </div>
+    </header>
+
+    <section class="panel" aria-label="Word list">
+      <div class="controls">
+        <div class="field">
+          <label for="cols-select">स्तंभ <span class="sep">/</span> Columns</label>
+          <select id="cols-select" class="select">
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="rows-select">पंक्तियाँ <span class="sep">/</span> Rows</label>
+          <select id="rows-select" class="select">
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+        <button id="copy-btn" class="btn btn-primary" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg>
+          <span class="btn-label">कॉपी / Copy</span>
+        </button>
+      </div>
+
+      <div id="status" class="status" role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <span class="status-text">Loading words…</span>
+      </div>
+
+      <div id="words-box" class="words-box" hidden>
+        <div id="words-grid" class="words-grid"></div>
+      </div>
+
+      <nav class="pagination" aria-label="Pagination">
+        <button id="prev-btn" class="btn btn-icon" type="button" aria-label="पिछला पृष्ठ / Previous page">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="page-info">
+          <span id="page-indicator" class="page-indicator" aria-live="polite"></span>
+          <span class="progress" aria-hidden="true"><span id="progress-bar" class="progress-bar"></span></span>
+        </div>
+        <button id="next-btn" class="btn btn-icon" type="button" aria-label="अगला पृष्ठ / Next page">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </nav>
+    </section>
+
+    <section id="prompts-section" class="panel prompts" aria-labelledby="prompts-title" hidden>
+      <h2 id="prompts-title" class="section-title">प्रॉम्प्ट के साथ कॉपी <span class="sep">/</span> Copy with Prompts</h2>
+      <ul id="prompts-list" class="prompts-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
