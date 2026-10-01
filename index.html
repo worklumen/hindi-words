@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f1f2f8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b0d17" media="(prefers-color-scheme: dark)">
-  <title>Hindi Words</title>
+  <title>हिन्दी शब्द / Hindi Words</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234338ca'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23fff' font-family='Noto Sans Devanagari, sans-serif'%3E%E0%A4%B9%E0%A4%BF%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,8 +71,19 @@
     </section>
 
     <section id="prompts-section" class="panel prompts" aria-labelledby="prompts-title" hidden>
-      <h2 id="prompts-title" class="section-title">प्रॉम्प्ट के साथ कॉपी <span class="sep">/</span> Copy with Prompts</h2>
-      <ul id="prompts-list" class="prompts-list"></ul>
+      <div class="prompts-head">
+        <h2 id="prompts-title" class="section-title">प्रॉम्प्ट के साथ कॉपी <span class="sep">/</span> Copy with Prompts</h2>
+        <div class="carousel-nav">
+          <button id="prompt-prev" class="btn btn-icon btn-sm" type="button" aria-label="पिछला प्रॉम्प्ट / Previous prompt">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <span id="prompt-counter" class="page-indicator" aria-live="polite"></span>
+          <button id="prompt-next" class="btn btn-icon btn-sm" type="button" aria-label="अगला प्रॉम्प्ट / Next prompt">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <ul id="prompts-list" class="prompts-list" aria-roledescription="carousel" aria-label="Prompts"></ul>
     </section>
   </main>
 

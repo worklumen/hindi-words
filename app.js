@@ -15,9 +15,46 @@
   });
 
   const PROMPTS = Object.freeze([
-    "Form sentences with these Hindi words and generate a portrait orientation (vertical, mobile-friendly) image with these texts and sentences rendered in it, also, add word wise meaning and transliteration to read Hindi",
-                                "Create a short story using these Hindi words and generate a portrait orientation (vertical, mobile-friendly) illustrated image of the story with the Hindi sentences written in it, with word-by-word meaning in English and transliteration for each sentence",
-                                "Make flashcards for these Hindi words with meaning, transliteration and one example sentence each, and generate a portrait orientation (vertical, mobile-friendly) image showing all the flashcards stacked vertically with the Hindi text clearly readable",
+    {
+      title: "वाक्य / Sentences",
+      text: "Write one natural, everyday Hindi sentence for each of these Hindi words, then generate a portrait-orientation (vertical, mobile-friendly) image showing every sentence in large, clear Devanagari with its transliteration in Roman letters and a word-by-word English meaning underneath.",
+    },
+    {
+      title: "कहानी / Short story",
+      text: "Write a short, simple story in Hindi that uses all of these Hindi words, then generate a portrait-orientation (vertical, mobile-friendly) illustrated image of the story with the Hindi sentences written in it, plus transliteration and English meaning for each sentence.",
+    },
+    {
+      title: "फ़्लैशकार्ड / Flashcards",
+      text: "Make a flashcard for each of these Hindi words with its meaning, transliteration and one example sentence, then generate a portrait-orientation (vertical, mobile-friendly) image with the flashcards stacked vertically and the Hindi text large and easy to read.",
+    },
+    {
+      title: "संवाद / Dialogue",
+      text: "Write a short, friendly conversation between two people in everyday Hindi that uses all of these Hindi words, then generate a portrait-orientation (vertical, mobile-friendly) chat-style image with speech bubbles showing the Hindi, its transliteration and the English meaning.",
+    },
+    {
+      title: "कॉमिक / Comic strip",
+      text: "Turn these Hindi words into a light-hearted comic strip with a clear beginning, middle and end, then generate it as a portrait-orientation (vertical, mobile-friendly) image with Hindi captions, each followed by transliteration and English meaning.",
+    },
+    {
+      title: "चित्र शब्दकोश / Picture dictionary",
+      text: "For each of these Hindi words, draw a simple illustration that makes its meaning obvious, then generate a portrait-orientation (vertical, mobile-friendly) visual-dictionary poster labelling every picture with the Hindi word, its transliteration and its English meaning.",
+    },
+    {
+      title: "प्रश्नोत्तरी / Quiz",
+      text: "Create a fill-in-the-blank quiz from these Hindi words: one Hindi sentence per word with the word left blank and a few transliterated options to choose from. Generate it as a portrait-orientation (vertical, mobile-friendly) image with the answer key at the bottom.",
+    },
+    {
+      title: "याद रखने के तरीके / Memory hooks",
+      text: "Give me a memorable hook for each of these Hindi words by linking its sound to a familiar English word or a vivid mental picture, then generate a portrait-orientation (vertical, mobile-friendly) image showing the Hindi word, transliteration, meaning and hook together.",
+    },
+    {
+      title: "शब्द परिवार / Word families",
+      text: "For each of these Hindi words, give one related word (a synonym, an opposite or a word from the same family) and one common phrase that uses it, then generate a tidy portrait-orientation (vertical, mobile-friendly) chart with transliteration and English meaning for everything.",
+    },
+    {
+      title: "डायरी / Diary page",
+      text: "Write a first-person diary entry in simple Hindi about an ordinary day, using all of these Hindi words, then generate a portrait-orientation (vertical, mobile-friendly) image styled like a journal page, with transliteration and English meaning beneath each sentence.",
+    },
   ]);
 
   const COPY_ICON =
@@ -43,6 +80,9 @@
  progressBar: $("progress-bar"),
  promptsSection: $("prompts-section"),
  promptsList: $("prompts-list"),
+ promptPrev: $("prompt-prev"),
+ promptNext: $("prompt-next"),
+ promptCounter: $("prompt-counter"),
   };
 
   /* ======================================================================
@@ -71,6 +111,7 @@
    * ====================================================================== */
 
   let words = []; // [{ word, freq }]
+  let prompts = []; // PROMPTS in a random order for this visit
   const state = { ...CONFIG.defaults };
 
   const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
@@ -219,29 +260,88 @@
     saveState();
   }
 
+  function shuffle(list) {
+    const a = [...list];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
   function renderPrompts() {
     const frag = document.createDocumentFragment();
 
-    PROMPTS.forEach((prompt, index) => {
+    prompts.forEach((prompt, index) => {
       const li = document.createElement("li");
-      li.className = "prompt-row";
+      li.className = "prompt-card";
+      li.setAttribute("role", "group");
+      li.setAttribute("aria-roledescription", "slide");
+      li.setAttribute("aria-label", `${index + 1} / ${prompts.length}`);
 
-      const text = document.createElement("span");
+      const title = document.createElement("h3");
+      title.className = "prompt-title";
+      title.textContent = prompt.title;
+
+      const text = document.createElement("p");
       text.className = "prompt-text";
-      text.textContent = prompt;
-      text.title = prompt;
+      text.textContent = prompt.text;
 
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "btn btn-ghost";
+      btn.className = "btn btn-ghost prompt-copy";
       btn.dataset.promptIndex = String(index);
       btn.innerHTML = `${COPY_ICON}<span class="btn-label">कॉपी / Copy</span>`;
 
-      li.append(text, btn);
+      li.append(title, text, btn);
       frag.append(li);
     });
 
     els.promptsList.replaceChildren(frag);
+    updateCarousel();
+  }
+
+  /* ======================================================================
+   * Prompt carousel (swipe, or use the arrow buttons)
+   * ====================================================================== */
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function activePromptIndex() {
+    const cards = Array.from(els.promptsList.children);
+    const left = els.promptsList.scrollLeft;
+    let best = 0;
+    let bestDist = Infinity;
+    cards.forEach((card, i) => {
+      const dist = Math.abs(card.offsetLeft - left);
+      if (dist < bestDist) {
+        best = i;
+        bestDist = dist;
+      }
+    });
+    return best;
+  }
+
+  function updateCarousel() {
+    const index = activePromptIndex();
+    els.promptCounter.textContent = `${index + 1} / ${prompts.length}`;
+    els.promptPrev.disabled = index <= 0;
+    els.promptNext.disabled = index >= prompts.length - 1;
+  }
+
+  function goToPrompt(index) {
+    const card = els.promptsList.children[clamp(index, 0, prompts.length - 1)];
+    if (!card) return;
+    els.promptsList.scrollTo({
+      left: card.offsetLeft,
+      behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+    });
+  }
+
+  let carouselFrame = 0;
+  function onCarouselScroll() {
+    cancelAnimationFrame(carouselFrame);
+    carouselFrame = requestAnimationFrame(updateCarousel);
   }
 
   /* ======================================================================
@@ -329,8 +429,13 @@
 
     els.promptsList.addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-prompt-index]");
-      if (btn) copyWithPrompt(btn, PROMPTS[Number(btn.dataset.promptIndex)]);
+      if (btn) copyWithPrompt(btn, prompts[Number(btn.dataset.promptIndex)].text);
     });
+
+      els.promptsList.addEventListener("scroll", onCarouselScroll, { passive: true });
+      els.promptPrev.addEventListener("click", () => goToPrompt(activePromptIndex() - 1));
+      els.promptNext.addEventListener("click", () => goToPrompt(activePromptIndex() + 1));
+      window.addEventListener("resize", () => goToPrompt(activePromptIndex()));
 
       document.addEventListener("keydown", (e) => {
         if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -384,6 +489,7 @@
     els.status.hidden = true;
     els.wordsBox.hidden = false;
     els.promptsSection.hidden = false;
+    prompts = shuffle(PROMPTS);
     renderPrompts();
     render();
   }
